@@ -1,0 +1,1905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyVoyage Airlines - Book Your Journey</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* Realistic Airplane Animation */
+        .airplane-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9998;
+            opacity: 0.7;
+        }
+
+        .airplane {
+            position: absolute;
+            font-size: 3rem;
+            animation: flyAcross 25s linear infinite;
+            filter: drop-shadow(2px 2px 5px rgba(0,0,0,0.3));
+            transform: translateX(-200px);
+        }
+
+        @keyframes flyAcross {
+            0% {
+                transform: translateX(-200px) translateY(100px) rotate(5deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            50% {
+                transform: translateX(50vw) translateY(50px) rotate(0deg);
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(120vw) translateY(80px) rotate(-5deg);
+                opacity: 0;
+            }
+        }
+
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            animation: cloudFloat 60s linear infinite;
+        }
+
+        .cloud-1 { width: 120px; height: 60px; top: 20%; left: -100px; animation-delay: 0s; }
+        .cloud-2 { width: 180px; height: 90px; top: 30%; left: -180px; animation-delay: 20s; }
+        .cloud-3 { width: 150px; height: 75px; top: 15%; left: -150px; animation-delay: 40s; }
+
+        @keyframes cloudFloat {
+            0% {
+                transform: translateX(-200px);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.8;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateX(calc(100vw + 200px));
+                opacity: 0;
+            }
+        }
+
+        /* Navigation */
+        nav {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-links a:hover {
+            color: #ffd700;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><rect fill="%231e3c72" width="1200" height="600"/><path fill="%232a5298" d="M0 300L50 320L100 310L150 330L200 315L250 335L300 320L350 340L400 325L450 345L500 330L550 350L600 335L650 355L700 340L750 360L800 345L850 365L900 350L950 370L1000 355L1050 375L1100 360L1150 380L1200 365V600H0Z"/></svg>');
+            background-size: cover;
+            background-position: center;
+            height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .hero-content p {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Sections */
+        .section {
+            display: none;
+            padding: 3rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: #1e3c72;
+            text-align: center;
+        }
+
+        /* Flight Search Form */
+        .flight-search {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-top: -100px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .tab-btn {
+            padding: 0.8rem 2rem;
+            border: none;
+            background: #f0f0f0;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: #1e3c72;
+            color: white;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .form-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input, .form-group select {
+            padding: 0.8rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #1e3c72;
+        }
+
+        .suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .suggestion-item {
+            padding: 0.8rem;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+
+        .suggestion-item:hover {
+            background: #f0f0f0;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 1rem 3rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.3s;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(30, 60, 114, 0.3);
+        }
+
+        /* Flight Results */
+        .flight-results {
+            display: none;
+            margin-top: 2rem;
+        }
+
+        .flight-card {
+            background: white;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.3s;
+        }
+
+        .flight-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .flight-info {
+            display: flex;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .flight-time {
+            text-align: center;
+        }
+
+        .flight-time .time {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1e3c72;
+        }
+
+        .flight-time .city {
+            color: #666;
+            margin-top: 0.3rem;
+        }
+
+        .flight-duration {
+            text-align: center;
+            color: #666;
+        }
+
+        .flight-price .price {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1e3c72;
+        }
+
+        /* Login/Register Section */
+        .auth-container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            padding: 3rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #eee;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .auth-tab.active {
+            border-bottom-color: #1e3c72;
+            color: #1e3c72;
+            font-weight: bold;
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .auth-form input {
+            width: 100%;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .auth-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .auth-links a {
+            color: #1e3c72;
+            text-decoration: none;
+        }
+
+        /* Passenger Details Form */
+        .passenger-form {
+            max-width: 600px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        /* Payment Section */
+        .payment-form {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .card-icons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 35px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* AI Chat */
+        .chat-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 10px;
+            max-width: 80%;
+        }
+
+        .message.user {
+            background: #1e3c72;
+            color: white;
+            margin-left: auto;
+        }
+
+        .message.bot {
+            background: #f0f0f0;
+        }
+
+        .flight-suggestion {
+            background: #e8f4fd;
+            border: 1px solid #1e3c72;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Voice Recording Styles */
+        .voice-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 0 1rem;
+        }
+
+        .voice-btn {
+            background: #1e3c72;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+
+        .voice-btn:hover {
+            background: #2a5298;
+            transform: scale(1.1);
+        }
+
+        .voice-btn.recording {
+            background: #e74c3c;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .voice-status {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* FAQ Styles */
+        .faq-section {
+            margin-top: 1rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .faq-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #1e3c72;
+        }
+
+        .faq-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .faq-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #1e3c72;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .faq-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .faq-question {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .faq-answer {
+            color: #666;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .faq-item.active .faq-answer {
+            display: block;
+        }
+
+        /* Chat input with voice */
+        .chat-input-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 1rem;
+        }
+
+        .chat-input-row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .chat-input-row input {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .chat-input-row button {
+            padding: 1rem 2rem;
+            background: #1e3c72;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Features */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            text-align: center;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        /* About Section */
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .about-text {
+            line-height: 1.8;
+        }
+
+        .about-text p {
+            margin-bottom: 1rem;
+            color: #555;
+        }
+
+        /* Map */
+        .map-container {
+            width: 100%;
+            height: 500px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        /* Footer */
+        footer {
+            background: #1e3c72;
+            color: white;
+            padding: 3rem 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: #ddd;
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+            
+            .about-content {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .flight-info {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .airplane {
+                font-size: 2rem;
+            }
+
+            .faq-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Realistic Airplane Animation -->
+    <div class="airplane-container">
+        <div class="airplane">✈️</div>
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">✈️ SkyVoyage Airlines</div>
+            <ul class="nav-links">
+                <li><a onclick="showSection('home')">Home</a></li>
+                <li><a onclick="showSection('about')">About Us</a></li>
+                <li><a onclick="showSection('flights')">Flights</a></li>
+                <li><a onclick="showSection('payment')">Payment</a></li>
+                <li><a onclick="showSection('help')">Help</a></li>
+                <li><a onclick="showSection('map')">Map</a></li>
+                <li><a onclick="showSection('login')">Login</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Home Section -->
+    <div id="home" class="section active">
+        <div class="hero">
+            <div class="hero-content">
+                <h1>Welcome to SkyVoyage Airlines</h1>
+                <p>Your Journey Begins Here</p>
+            </div>
+        </div>
+
+        <div style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
+            <div class="flight-search">
+                <h2 style="text-align: center; margin-bottom: 2rem;">Book Your Flight</h2>
+                
+                <div class="tab-buttons">
+                    <button class="tab-btn active" onclick="switchTab('domestic')">Domestic</button>
+                    <button class="tab-btn" onclick="switchTab('international')">International</button>
+                </div>
+
+                <form id="flightSearchForm" onsubmit="searchFlights(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>From</label>
+                            <input type="text" id="from" placeholder="Departure City" required 
+                                   oninput="showSuggestions(this, 'from')">
+                            <div class="suggestions" id="fromSuggestions"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>To</label>
+                            <input type="text" id="to" placeholder="Arrival City" required 
+                                   oninput="showSuggestions(this, 'to')">
+                            <div class="suggestions" id="toSuggestions"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Departure Date</label>
+                            <input type="date" id="departDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Return Date</label>
+                            <input type="date" id="returnDate">
+                        </div>
+                        <div class="form-group">
+                            <label>Passengers</label>
+                            <select id="passengers">
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+                                <option>4</option>
+                                <option>5+</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Class</label>
+                            <select id="class">
+                                <option>Economy</option>
+                                <option>Premium Economy</option>
+                                <option>Business</option>
+                                <option>First Class</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary">Search Flights</button>
+                </form>
+
+                <div class="flight-results" id="flightResults"></div>
+            </div>
+
+            <div class="features">
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3>Global Network</h3>
+                    <p>Fly to 200+ destinations worldwide</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💺</div>
+                    <h3>Comfort & Luxury</h3>
+                    <p>Experience premium comfort in every class</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⏰</div>
+                    <h3>On-Time Performance</h3>
+                    <p>98% on-time arrival rate</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎫</div>
+                    <h3>Best Prices</h3>
+                    <p>Competitive fares with no hidden costs</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Section -->
+    <div id="about" class="section">
+        <h2>About SkyVoyage Airlines</h2>
+        <div class="about-content">
+            <div class="about-text">
+                <p>At SkyVoyage, we're redefining what it means to fly. We understand that every traveler has a unique story, and our purpose is to provide the reliable, friendly, and efficient service that makes your story possible.</p>
+                <p>We combine modern, fuel-efficient aircraft with a passionate crew to ensure your journey is safe, smooth, and enjoyable. Whether you're traveling for business, family, or the thrill of discovery, SkyVoyage is your trusted partner in the skies, dedicated to getting you there with care and convenience.</p>
+                
+                <h3 style="margin-top: 2rem; color: #1e3c72;">Our Values</h3>
+                <ul style="line-height: 2; color: #555;">
+                    <li>✓ Safety First - Your security is our priority</li>
+                    <li>✓ Customer Excellence - We go above and beyond</li>
+                    <li>✓ Environmental Responsibility - Committed to sustainable aviation</li>
+                    <li>✓ Innovation - Leading the future of air travel</li>
+                </ul>
+            </div>
+            <div>
+                <div style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); height: 400px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 4rem;">
+                    ✈️
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Flights Section -->
+    <div id="flights" class="section">
+        <h2>Available Flights</h2>
+        <div class="flight-search">
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="switchTab('domestic')">Domestic Flights</button>
+                <button class="tab-btn" onclick="switchTab('international')">International Flights</button>
+            </div>
+
+            <div id="domesticFlights">
+                <h3 style="margin: 2rem 0;">Popular Domestic Routes in India</h3>
+                <!-- Domestic flights will be populated by JavaScript -->
+            </div>
+
+            <div id="internationalFlights" style="display: none;">
+                <h3 style="margin: 2rem 0;">International Routes</h3>
+                <!-- International flights will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Login/Register Section -->
+    <div id="login" class="section">
+        <div class="auth-container">
+            <div class="auth-tabs">
+                <div class="auth-tab active" onclick="switchAuthTab('login')">Login</div>
+                <div class="auth-tab" onclick="switchAuthTab('register')">Register</div>
+            </div>
+
+            <div id="loginForm" class="auth-form active">
+                <h2>Login to Your Account</h2>
+                <form onsubmit="handleLogin(event)">
+                    <input type="email" placeholder="Email Address" required>
+                    <input type="password" placeholder="Password" required>
+                    <button type="submit" class="btn-primary">Login</button>
+                    <div class="auth-links">
+                        <a href="#">Forgot Password?</a>
+                    </div>
+                </form>
+            </div>
+
+            <div id="registerForm" class="auth-form">
+                <h2>Create New Account</h2>
+                <form onsubmit="handleRegister(event)">
+                    <input type="text" placeholder="Full Name" required>
+                    <input type="email" placeholder="Email Address" required>
+                    <input type="tel" placeholder="Phone Number" required>
+                    <input type="password" placeholder="Password" required>
+                    <input type="password" placeholder="Confirm Password" required>
+                    <button type="submit" class="btn-primary">Create Account</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Passenger Details Section -->
+    <div id="passengerDetails" class="section">
+        <h2>Passenger Details</h2>
+        <div class="passenger-form">
+            <form id="passengerForm" onsubmit="handlePassengerDetails(event)">
+                <h3 style="margin-bottom: 1rem; color: #1e3c72;">Primary Passenger</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <input type="text" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <input type="text" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Date of Birth</label>
+                        <input type="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <select required>
+                            <option value="">Select</option>
+                            <option>Male</option>
+                            <option>Female</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <h3 style="margin: 2rem 0 1rem 0; color: #1e3c72;">Contact Information</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" required>
+                    </div>
+                </div>
+
+                <h3 style="margin: 2rem 0 1rem 0; color: #1e3c72;">Emergency Contact</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary">Continue to Payment</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Payment Section -->
+    <div id="payment" class="section">
+        <h2>Payment Information</h2>
+        <div class="payment-form">
+            <div class="card-icons">
+                <div class="card-icon">VISA</div>
+                <div class="card-icon">MC</div>
+                <div class="card-icon">AMEX</div>
+                <div class="card-icon">PP</div>
+            </div>
+            <form onsubmit="handlePayment(event)">
+                <div class="form-group">
+                    <label>Card Number</label>
+                    <input type="text" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                </div>
+                <div class="form-group">
+                    <label>Cardholder Name</label>
+                    <input type="text" placeholder="John Doe" required>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Expiry Date</label>
+                        <input type="text" placeholder="MM/YY" maxlength="5" required>
+                    </div>
+                    <div class="form-group">
+                        <label>CVV</label>
+                        <input type="text" placeholder="123" maxlength="3" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Billing Address</label>
+                    <input type="text" placeholder="Street Address" required>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>City</label>
+                        <input type="text" placeholder="City" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary">Complete Payment</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Help/AI Chat Section -->
+    <div id="help" class="section">
+        <h2>Customer Support - AI Assistant</h2>
+        <div class="chat-container">
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot">
+                    <strong>Hello! I'm your SkyVoyage AI assistant. How can I help you today?</strong><br><br>
+                    I can assist you with:
+                    <br>• Flight bookings and modifications
+                    <br>• Baggage information
+                    <br>• Check-in procedures
+                    <br>• Travel policies
+                    <br>• Route suggestions
+                    <br>• Price inquiries
+                    <br><br>
+                    <em>Try asking: "I want to book a flight from Delhi to Mumbai" or "Show me flights to London" or "Bangalore to Chennai flights"</em>
+                </div>
+            </div>
+
+            <!-- Voice Controls -->
+            <div class="voice-controls">
+                <button class="voice-btn" id="voiceBtn" title="Click and speak">
+                    🎤
+                </button>
+                <div class="voice-status" id="voiceStatus">Click microphone and speak</div>
+            </div>
+
+            <!-- Frequently Asked Questions -->
+            <div class="faq-section">
+                <div class="faq-title">Frequently Asked Questions</div>
+                <div class="faq-grid">
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-question">How do I book a flight?</div>
+                        <div class="faq-answer">You can book flights through our website, mobile app, or by speaking to our AI assistant. Just tell us your departure and destination cities.</div>
+                    </div>
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-question">What's the baggage allowance?</div>
+                        <div class="faq-answer">Economy: 1 checked bag (23kg), 1 carry-on (7kg). Business: 2 checked bags (32kg each), 1 carry-on (7kg).</div>
+                    </div>
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-question">When can I check-in online?</div>
+                        <div class="faq-answer">Online check-in opens 24 hours before departure and closes 2 hours before flight time.</div>
+                    </div>
+                    <div class="faq-item" onclick="toggleFAQ(this)">
+                        <div class="faq-question">Can I cancel my flight?</div>
+                        <div class="faq-answer">Yes, cancellation policies vary by fare type. Flexible tickets offer full refunds up to 24 hours before departure.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="chat-input-container">
+                <div class="chat-input-row">
+                    <input type="text" id="chatInput" placeholder="Type your question here... (e.g., book flight from Delhi to Mumbai)">
+                    <button onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Map Section -->
+    <div id="map" class="section">
+        <h2>Our Global Network</h2>
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <div style="background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+                <div class="form-grid" style="grid-template-columns: 1fr 1fr auto;">
+                    <div class="form-group">
+                        <label>From</label>
+                        <input type="text" id="startLocation" placeholder="City" list="locationsList">
+                    </div>
+                    <div class="form-group">
+                        <label>To</label>
+                        <input type="text" id="destLocation" placeholder="City" list="locationsList">
+                    </div>
+                    <div class="form-group" style="align-self: flex-end;">
+                        <button onclick="calculateRoute()" class="btn-primary" style="width: auto; padding: 0.8rem 2rem;">Calculate</button>
+                    </div>
+                </div>
+                <datalist id="locationsList"></datalist>
+                <div id="routeInfo" style="margin-top: 1.5rem; padding: 1.5rem; background: #f8f9fa; border-radius: 8px; display: none;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; text-align: center;">
+                        <div><div style="color: #666; font-size: 0.9rem;">Distance</div><div style="font-size: 1.8rem; font-weight: bold; color: #1e3c72;" id="distanceDisplay">-</div></div>
+                        <div><div style="color: #666; font-size: 0.9rem;">Flight Time</div><div style="font-size: 1.8rem; font-weight: bold; color: #1e3c72;" id="flightTimeDisplay">-</div></div>
+                        <div><div style="color: #666; font-size: 0.9rem;">Time Difference</div><div style="font-size: 1.8rem; font-weight: bold; color: #1e3c72;" id="timezoneDisplay">-</div></div>
+                    </div>
+                </div>
+            </div>
+            <div id="globeContainer" style="height: 600px; background: #000; border-radius: 10px; position: relative;">
+                <canvas id="globeCanvas" style="width: 100%; height: 100%;"></canvas>
+                <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.95); padding: 1rem; border-radius: 8px;">
+                    <button onclick="resetGlobe()" style="padding: 0.5rem 1rem; background: #1e3c72; color: white; border: none; border-radius: 5px; cursor: pointer; margin-right: 1rem;">Reset</button>
+                    <label><input type="checkbox" id="autoRotate" checked onchange="toggleRotation()"> Auto Rotate</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div style="max-width: 1200px; margin: 0 auto; text-align: center;">
+            <p>&copy; 2025 SkyVoyage Airlines. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Comprehensive Flight Database with All Indian States and International Countries
+        const flightData = {
+            domestic: [
+                // Major Metro Routes
+                { from: 'Delhi', to: 'Mumbai', price: 4200, duration: '2h 30m', flightNo: 'SV101' },
+                { from: 'Mumbai', to: 'Delhi', price: 4200, duration: '2h 30m', flightNo: 'SV102' },
+                { from: 'Bangalore', to: 'Delhi', price: 4800, duration: '2h 45m', flightNo: 'SV103' },
+                { from: 'Delhi', to: 'Bangalore', price: 4800, duration: '2h 45m', flightNo: 'SV104' },
+                { from: 'Chennai', to: 'Mumbai', price: 4500, duration: '2h 15m', flightNo: 'SV105' },
+                { from: 'Mumbai', to: 'Chennai', price: 4500, duration: '2h 15m', flightNo: 'SV106' },
+                { from: 'Kolkata', to: 'Delhi', price: 5200, duration: '2h 30m', flightNo: 'SV107' },
+                { from: 'Delhi', to: 'Kolkata', price: 5200, duration: '2h 30m', flightNo: 'SV108' },
+                { from: 'Hyderabad', to: 'Bangalore', price: 3800, duration: '1h 15m', flightNo: 'SV109' },
+                { from: 'Bangalore', to: 'Hyderabad', price: 3800, duration: '1h 15m', flightNo: 'SV110' },
+
+                // Southern States
+                { from: 'Chennai', to: 'Bangalore', price: 3200, duration: '1h 00m', flightNo: 'SV111' },
+                { from: 'Bangalore', to: 'Chennai', price: 3200, duration: '1h 00m', flightNo: 'SV112' },
+                { from: 'Hyderabad', to: 'Chennai', price: 4200, duration: '1h 30m', flightNo: 'SV113' },
+                { from: 'Chennai', to: 'Hyderabad', price: 4200, duration: '1h 30m', flightNo: 'SV114' },
+                { from: 'Bangalore', to: 'Kochi', price: 3800, duration: '1h 15m', flightNo: 'SV115' },
+                { from: 'Kochi', to: 'Bangalore', price: 3800, duration: '1h 15m', flightNo: 'SV116' },
+                { from: 'Chennai', to: 'Thiruvananthapuram', price: 4500, duration: '1h 30m', flightNo: 'SV117' },
+                { from: 'Thiruvananthapuram', to: 'Chennai', price: 4500, duration: '1h 30m', flightNo: 'SV118' },
+
+                // Western States
+                { from: 'Mumbai', to: 'Ahmedabad', price: 3500, duration: '1h 15m', flightNo: 'SV119' },
+                { from: 'Ahmedabad', to: 'Mumbai', price: 3500, duration: '1h 15m', flightNo: 'SV120' },
+                { from: 'Mumbai', to: 'Pune', price: 2800, duration: '0h 45m', flightNo: 'SV121' },
+                { from: 'Pune', to: 'Mumbai', price: 2800, duration: '0h 45m', flightNo: 'SV122' },
+                { from: 'Mumbai', to: 'Goa', price: 4200, duration: '1h 15m', flightNo: 'SV123' },
+                { from: 'Goa', to: 'Mumbai', price: 4200, duration: '1h 15m', flightNo: 'SV124' },
+
+                // Northern States
+                { from: 'Delhi', to: 'Jaipur', price: 3200, duration: '1h 00m', flightNo: 'SV125' },
+                { from: 'Jaipur', to: 'Delhi', price: 3200, duration: '1h 00m', flightNo: 'SV126' },
+                { from: 'Delhi', to: 'Lucknow', price: 3500, duration: '1h 15m', flightNo: 'SV127' },
+                { from: 'Lucknow', to: 'Delhi', price: 3500, duration: '1h 15m', flightNo: 'SV128' },
+                { from: 'Delhi', to: 'Chandigarh', price: 3000, duration: '1h 00m', flightNo: 'SV129' },
+                { from: 'Chandigarh', to: 'Delhi', price: 3000, duration: '1h 00m', flightNo: 'SV130' },
+
+                // Eastern States
+                { from: 'Kolkata', to: 'Guwahati', price: 5200, duration: '2h 00m', flightNo: 'SV131' },
+                { from: 'Guwahati', to: 'Kolkata', price: 5200, duration: '2h 00m', flightNo: 'SV132' },
+                { from: 'Kolkata', to: 'Bhubaneswar', price: 3800, duration: '1h 30m', flightNo: 'SV133' },
+                { from: 'Bhubaneswar', to: 'Kolkata', price: 3800, duration: '1h 30m', flightNo: 'SV134' },
+                { from: 'Kolkata', to: 'Patna', price: 4200, duration: '1h 45m', flightNo: 'SV135' },
+                { from: 'Patna', to: 'Kolkata', price: 4200, duration: '1h 45m', flightNo: 'SV136' },
+
+                // Central States
+                { from: 'Delhi', to: 'Bhopal', price: 4500, duration: '1h 30m', flightNo: 'SV137' },
+                { from: 'Bhopal', to: 'Delhi', price: 4500, duration: '1h 30m', flightNo: 'SV138' },
+                { from: 'Mumbai', to: 'Nagpur', price: 4800, duration: '1h 45m', flightNo: 'SV139' },
+                { from: 'Nagpur', to: 'Mumbai', price: 4800, duration: '1h 45m', flightNo: 'SV140' }
+            ],
+
+            international: [
+                // Middle East
+                { from: 'Delhi', to: 'Dubai', price: 18500, duration: '3h 30m', flightNo: 'SV2001' },
+                { from: 'Mumbai', to: 'Dubai', price: 16500, duration: '3h 15m', flightNo: 'SV2002' },
+                { from: 'Delhi', to: 'Abu Dhabi', price: 19500, duration: '3h 45m', flightNo: 'SV2003' },
+                { from: 'Chennai', to: 'Doha', price: 21500, duration: '4h 30m', flightNo: 'SV2004' },
+                { from: 'Bangalore', to: 'Riyadh', price: 22500, duration: '5h 00m', flightNo: 'SV2005' },
+
+                // Southeast Asia
+                { from: 'Delhi', to: 'Singapore', price: 21800, duration: '5h 30m', flightNo: 'SV2006' },
+                { from: 'Mumbai', to: 'Singapore', price: 19800, duration: '5h 15m', flightNo: 'SV2007' },
+                { from: 'Chennai', to: 'Kuala Lumpur', price: 18500, duration: '4h 00m', flightNo: 'SV2008' },
+                { from: 'Kolkata', to: 'Bangkok', price: 17500, duration: '3h 30m', flightNo: 'SV2009' },
+                { from: 'Delhi', to: 'Bangkok', price: 19500, duration: '4h 00m', flightNo: 'SV2010' },
+
+                // Europe
+                { from: 'Delhi', to: 'London', price: 42500, duration: '9h 30m', flightNo: 'SV2011' },
+                { from: 'Mumbai', to: 'London', price: 45500, duration: '10h 00m', flightNo: 'SV2012' },
+                { from: 'Delhi', to: 'Paris', price: 45200, duration: '9h 45m', flightNo: 'SV2013' },
+                { from: 'Bangalore', to: 'Frankfurt', price: 48500, duration: '10h 30m', flightNo: 'SV2014' },
+                { from: 'Mumbai', to: 'Amsterdam', price: 46500, duration: '10h 15m', flightNo: 'SV2015' },
+
+                // North America
+                { from: 'Delhi', to: 'New York', price: 78500, duration: '15h 30m', flightNo: 'SV2016' },
+                { from: 'Mumbai', to: 'New York', price: 81500, duration: '16h 00m', flightNo: 'SV2017' },
+                { from: 'Bangalore', to: 'San Francisco', price: 89500, duration: '17h 30m', flightNo: 'SV2018' },
+                { from: 'Delhi', to: 'Chicago', price: 82500, duration: '16h 00m', flightNo: 'SV2019' },
+                { from: 'Mumbai', to: 'Toronto', price: 84500, duration: '16h 30m', flightNo: 'SV2020' },
+
+                // East Asia
+                { from: 'Delhi', to: 'Tokyo', price: 38500, duration: '7h 30m', flightNo: 'SV2021' },
+                { from: 'Mumbai', to: 'Seoul', price: 36500, duration: '7h 00m', flightNo: 'SV2022' },
+                { from: 'Kolkata', to: 'Hong Kong', price: 32500, duration: '4h 30m', flightNo: 'SV2023' },
+                { from: 'Chennai', to: 'Shanghai', price: 34500, duration: '6h 30m', flightNo: 'SV2024' },
+                { from: 'Delhi', to: 'Beijing', price: 39500, duration: '6h 00m', flightNo: 'SV2025' },
+
+                // Australia
+                { from: 'Delhi', to: 'Sydney', price: 65500, duration: '12h 30m', flightNo: 'SV2026' },
+                { from: 'Mumbai', to: 'Melbourne', price: 68500, duration: '13h 00m', flightNo: 'SV2027' },
+                { from: 'Bangalore', to: 'Sydney', price: 69500, duration: '13h 30m', flightNo: 'SV2028' },
+
+                // Return flights
+                { from: 'Dubai', to: 'Delhi', price: 18500, duration: '3h 30m', flightNo: 'SV2029' },
+                { from: 'Singapore', to: 'Mumbai', price: 19800, duration: '5h 15m', flightNo: 'SV2030' },
+                { from: 'London', to: 'Delhi', price: 42500, duration: '9h 30m', flightNo: 'SV2031' },
+                { from: 'New York', to: 'Mumbai', price: 81500, duration: '16h 00m', flightNo: 'SV2032' },
+                { from: 'Tokyo', to: 'Delhi', price: 38500, duration: '7h 30m', flightNo: 'SV2033' },
+                { from: 'Sydney', to: 'Bangalore', price: 69500, duration: '13h 30m', flightNo: 'SV2034' }
+            ]
+        };
+
+        // Comprehensive City Database with All Indian States and International Countries
+        const cities = {
+            // Indian States and Major Cities
+            'Delhi': 'Delhi, National Capital Territory',
+            'Mumbai': 'Mumbai, Maharashtra',
+            'Bangalore': 'Bangalore, Karnataka',
+            'Chennai': 'Chennai, Tamil Nadu',
+            'Kolkata': 'Kolkata, West Bengal',
+            'Hyderabad': 'Hyderabad, Telangana',
+            'Pune': 'Pune, Maharashtra',
+            'Ahmedabad': 'Ahmedabad, Gujarat',
+            'Jaipur': 'Jaipur, Rajasthan',
+            'Lucknow': 'Lucknow, Uttar Pradesh',
+            'Chandigarh': 'Chandigarh',
+            'Dehradun': 'Dehradun, Uttarakhand',
+            'Shimla': 'Shimla, Himachal Pradesh',
+            'Srinagar': 'Srinagar, Jammu & Kashmir',
+            'Amritsar': 'Amritsar, Punjab',
+            'Bhopal': 'Bhopal, Madhya Pradesh',
+            'Indore': 'Indore, Madhya Pradesh',
+            'Nagpur': 'Nagpur, Maharashtra',
+            'Goa': 'Goa',
+            'Kochi': 'Kochi, Kerala',
+            'Thiruvananthapuram': 'Thiruvananthapuram, Kerala',
+            'Coimbatore': 'Coimbatore, Tamil Nadu',
+            'Madurai': 'Madurai, Tamil Nadu',
+            'Visakhapatnam': 'Visakhapatnam, Andhra Pradesh',
+            'Vijayawada': 'Vijayawada, Andhra Pradesh',
+            'Bhubaneswar': 'Bhubaneswar, Odisha',
+            'Guwahati': 'Guwahati, Assam',
+            'Imphal': 'Imphal, Manipur',
+            'Agartala': 'Agartala, Tripura',
+            'Shillong': 'Shillong, Meghalaya',
+            'Kohima': 'Kohima, Nagaland',
+            'Aizawl': 'Aizawl, Mizoram',
+            'Patna': 'Patna, Bihar',
+            'Ranchi': 'Ranchi, Jharkhand',
+            'Raipur': 'Raipur, Chhattisgarh',
+            'Surat': 'Surat, Gujarat',
+            'Vadodara': 'Vadodara, Gujarat',
+            'Rajkot': 'Rajkot, Gujarat',
+            'Jammu': 'Jammu, Jammu & Kashmir',
+            'Allahabad': 'Allahabad, Uttar Pradesh',
+            'Kanpur': 'Kanpur, Uttar Pradesh',
+            'Varanasi': 'Varanasi, Uttar Pradesh',
+            'Gurgaon': 'Gurgaon, Haryana',
+            'Faridabad': 'Faridabad, Haryana',
+            'Noida': 'Noida, Uttar Pradesh',
+
+            // International Countries and Cities
+            'Dubai': 'Dubai, UAE',
+            'Abu Dhabi': 'Abu Dhabi, UAE',
+            'Doha': 'Doha, Qatar',
+            'Riyadh': 'Riyadh, Saudi Arabia',
+            'Singapore': 'Singapore',
+            'Kuala Lumpur': 'Kuala Lumpur, Malaysia',
+            'Bangkok': 'Bangkok, Thailand',
+            'London': 'London, United Kingdom',
+            'Paris': 'Paris, France',
+            'Frankfurt': 'Frankfurt, Germany',
+            'Amsterdam': 'Amsterdam, Netherlands',
+            'New York': 'New York, USA',
+            'Chicago': 'Chicago, USA',
+            'San Francisco': 'San Francisco, USA',
+            'Toronto': 'Toronto, Canada',
+            'Tokyo': 'Tokyo, Japan',
+            'Seoul': 'Seoul, South Korea',
+            'Hong Kong': 'Hong Kong',
+            'Shanghai': 'Shanghai, China',
+            'Beijing': 'Beijing, China',
+            'Sydney': 'Sydney, Australia',
+            'Melbourne': 'Melbourne, Australia',
+            'Brisbane': 'Brisbane, Australia',
+            'Auckland': 'Auckland, New Zealand',
+            'Wellington': 'Wellington, New Zealand',
+            'Colombo': 'Colombo, Sri Lanka',
+            'Kathmandu': 'Kathmandu, Nepal',
+            'Dhaka': 'Dhaka, Bangladesh',
+            'Male': 'Male, Maldives',
+            'Istanbul': 'Istanbul, Turkey',
+            'Moscow': 'Moscow, Russia',
+            'Rome': 'Rome, Italy',
+            'Madrid': 'Madrid, Spain',
+            'Brussels': 'Brussels, Belgium',
+            'Vienna': 'Vienna, Austria',
+            'Zurich': 'Zurich, Switzerland',
+            'Stockholm': 'Stockholm, Sweden',
+            'Copenhagen': 'Copenhagen, Denmark',
+            'Oslo': 'Oslo, Norway',
+            'Helsinki': 'Helsinki, Finland',
+            'Dublin': 'Dublin, Ireland',
+            'Lisbon': 'Lisbon, Portugal',
+            'Athens': 'Athens, Greece',
+            'Cairo': 'Cairo, Egypt',
+            'Johannesburg': 'Johannesburg, South Africa',
+            'Nairobi': 'Nairobi, Kenya',
+            'Bali': 'Bali, Indonesia',
+            'Manila': 'Manila, Philippines',
+            'Hanoi': 'Hanoi, Vietnam',
+            'Ho Chi Minh City': 'Ho Chi Minh City, Vietnam'
+        };
+
+        // Global variables
+        let currentFlightType = 'domestic';
+        let selectedFlight = null;
+        let recognition = null;
+        let isListening = false;
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            populateFlightSections();
+            initializeCitySuggestions();
+            initializeVoiceRecognition();
+            
+            // Add click event to voice button
+            document.getElementById('voiceBtn').addEventListener('click', function() {
+                if (!isListening) {
+                    startListening();
+                } else {
+                    recognition.stop();
+                }
+            });
+
+            // Add FAQ items click to auto-fill chat
+            document.querySelectorAll('.faq-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const question = this.querySelector('.faq-question').textContent;
+                    document.getElementById('chatInput').value = question;
+                    
+                    // Auto-send after a short delay
+                    setTimeout(() => {
+                        sendMessage();
+                    }, 500);
+                });
+            });
+        });
+
+        // Populate flight sections
+        function populateFlightSections() {
+            const domesticSection = document.getElementById('domesticFlights');
+            const internationalSection = document.getElementById('internationalFlights');
+
+            domesticSection.innerHTML = '<h3 style="margin: 2rem 0;">Popular Domestic Routes in India</h3>';
+            internationalSection.innerHTML = '<h3 style="margin: 2rem 0;">International Routes</h3>';
+
+            // Show limited flights initially
+            flightData.domestic.slice(0, 8).forEach(flight => {
+                domesticSection.innerHTML += createFlightCard(flight, 'domestic');
+            });
+
+            flightData.international.slice(0, 8).forEach(flight => {
+                internationalSection.innerHTML += createFlightCard(flight, 'international');
+            });
+        }
+
+        function createFlightCard(flight, type) {
+            return `
+                <div class="flight-card">
+                    <div class="flight-info">
+                        <div class="flight-time">
+                            <div class="time">${getRandomTime()}</div>
+                            <div class="city">${flight.from}</div>
+                            <div style="font-size: 0.8rem; color: #666; margin-top: 0.2rem;">${flight.flightNo}</div>
+                        </div>
+                        <div class="flight-duration">
+                            <div>✈️</div>
+                            <div>${flight.duration}</div>
+                            <div>Non-stop</div>
+                        </div>
+                        <div class="flight-time">
+                            <div class="time">${getArrivalTime()}</div>
+                            <div class="city">${flight.to}</div>
+                            <div style="font-size: 0.8rem; color: #666; margin-top: 0.2rem;">${type === 'domestic' ? 'Domestic' : 'International'}</div>
+                        </div>
+                    </div>
+                    <div class="flight-price">
+                        <div class="price">₹${flight.price.toLocaleString('en-IN')}</div>
+                        <button class="btn-primary" onclick="selectFlight('${flight.from}', '${flight.to}', ${flight.price}, '${flight.flightNo}')" style="width: auto; padding: 0.5rem 2rem; margin-top: 0.5rem;">Book Now</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getRandomTime() {
+            const hours = Math.floor(Math.random() * 12) + 6;
+            const minutes = Math.floor(Math.random() * 60);
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+        }
+
+        function getArrivalTime() {
+            const hours = Math.floor(Math.random() * 12) + 14;
+            const minutes = Math.floor(Math.random() * 60);
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+        }
+
+        // City suggestions with fuzzy matching
+        function initializeCitySuggestions() {
+            const datalist = document.getElementById('locationsList');
+            Object.keys(cities).forEach(city => {
+                const opt = document.createElement('option');
+                opt.value = city;
+                datalist.appendChild(opt);
+            });
+        }
+
+        function showSuggestions(input, type) {
+            const suggestionsDiv = document.getElementById(type + 'Suggestions');
+            const value = input.value.toLowerCase();
+            
+            if (value.length < 2) {
+                suggestionsDiv.style.display = 'none';
+                return;
+            }
+
+            const matches = Object.keys(cities).filter(city => 
+                city.toLowerCase().includes(value) || 
+                cities[city].toLowerCase().includes(value)
+            );
+
+            suggestionsDiv.innerHTML = '';
+            matches.slice(0, 8).forEach(city => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.textContent = cities[city];
+                div.onclick = () => {
+                    input.value = city;
+                    suggestionsDiv.style.display = 'none';
+                };
+                suggestionsDiv.appendChild(div);
+            });
+
+            suggestionsDiv.style.display = matches.length ? 'block' : 'none';
+        }
+
+        // Close suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.matches('.form-group input')) {
+                document.querySelectorAll('.suggestions').forEach(s => s.style.display = 'none');
+            }
+        });
+
+        // Voice Recognition Setup
+        function initializeVoiceRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+
+                recognition.onstart = function() {
+                    isListening = true;
+                    document.getElementById('voiceBtn').classList.add('recording');
+                    document.getElementById('voiceStatus').textContent = 'Listening... Speak now';
+                };
+
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    document.getElementById('chatInput').value = transcript;
+                    document.getElementById('voiceStatus').textContent = `You said: "${transcript}"`;
+                    
+                    // Auto-send the message after voice input
+                    setTimeout(() => {
+                        sendMessage();
+                    }, 1000);
+                };
+
+                recognition.onerror = function(event) {
+                    console.error('Speech recognition error:', event.error);
+                    document.getElementById('voiceStatus').textContent = 'Error: ' + event.error;
+                    stopListening();
+                };
+
+                recognition.onend = function() {
+                    stopListening();
+                };
+            } else {
+                document.getElementById('voiceStatus').textContent = 'Voice recognition not supported in this browser';
+                document.getElementById('voiceBtn').style.display = 'none';
+            }
+        }
+
+        function startListening() {
+            if (recognition && !isListening) {
+                try {
+                    recognition.start();
+                } catch (error) {
+                    console.error('Error starting recognition:', error);
+                }
+            }
+        }
+
+        function stopListening() {
+            isListening = false;
+            document.getElementById('voiceBtn').classList.remove('recording');
+            if (!document.getElementById('chatInput').value) {
+                document.getElementById('voiceStatus').textContent = 'Click microphone and speak';
+            }
+        }
+
+        // FAQ functionality
+        function toggleFAQ(element) {
+            // Close all other FAQs
+            document.querySelectorAll('.faq-item').forEach(item => {
+                if (item !== element) {
+                    item.classList.remove('active');
+                }
+            });
+            
+            // Toggle current FAQ
+            element.classList.toggle('active');
+        }
+
+        // Enhanced AI Chat with voice responses
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message === '') return;
+
+            const messagesDiv = document.getElementById('chatMessages');
+            
+            // Add user message
+            const userMsg = document.createElement('div');
+            userMsg.className = 'message user';
+            userMsg.textContent = message;
+            messagesDiv.appendChild(userMsg);
+
+            // Generate bot response
+            setTimeout(() => {
+                const botMsg = document.createElement('div');
+                botMsg.className = 'message bot';
+                const response = generateSmartResponse(message);
+                
+                if (response.flightSuggestion) {
+                    botMsg.innerHTML = response.text;
+                    const suggestionDiv = document.createElement('div');
+                    suggestionDiv.className = 'flight-suggestion';
+                    suggestionDiv.innerHTML = response.flightSuggestion;
+                    botMsg.appendChild(suggestionDiv);
+                } else {
+                    botMsg.textContent = response.text;
+                }
+                
+                messagesDiv.appendChild(botMsg);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+                // Speak the response if voice is available
+                speakResponse(response.text);
+            }, 1000);
+
+            input.value = '';
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        // Text-to-Speech function
+        function speakResponse(text) {
+            if ('speechSynthesis' in window) {
+                // Clean the text for speech (remove HTML tags, etc.)
+                const cleanText = text.replace(/<[^>]*>/g, '').replace(/✈️|🛫|🛬|⏱️|💰|❌/g, '');
+                
+                const speech = new SpeechSynthesisUtterance();
+                speech.text = cleanText;
+                speech.volume = 1;
+                speech.rate = 1;
+                speech.pitch = 1;
+                speech.lang = 'en-US';
+
+                // Optional: Add voice selection
+                const voices = window.speechSynthesis.getVoices();
+                const englishVoice = voices.find(voice => voice.lang.includes('en'));
+                if (englishVoice) {
+                    speech.voice = englishVoice;
+                }
+
+                window.speechSynthesis.speak(speech);
+            }
+        }
+
+        // Enhanced response generator with voice-friendly responses
+        function generateSmartResponse(message) {
+            const lower = message.toLowerCase();
+            
+            // Flight booking detection
+            const flightPatterns = [
+                /(?:book|flight|fly|go|want).*?(?:from)\s+([a-zA-Z\s]+).*?(?:to)\s+([a-zA-Z\s]+)/,
+                /(?:flight|fly).*?(?:between)\s+([a-zA-Z\s]+).*?(?:and)\s+([a-zA-Z\s]+)/,
+                /(?:from)\s+([a-zA-Z\s]+).*?(?:to)\s+([a-zA-Z\s]+).*?(?:flight|fly)/,
+                /(?:show|find).*?(?:flight).*?(?:from)\s+([a-zA-Z\s]+).*?(?:to)\s+([a-zA-Z\s]+)/
+            ];
+
+            let fromCity = null;
+            let toCity = null;
+
+            for (const pattern of flightPatterns) {
+                const match = lower.match(pattern);
+                if (match) {
+                    fromCity = findMatchingCity(match[1].trim());
+                    toCity = findMatchingCity(match[2].trim());
+                    if (fromCity && toCity) break;
+                }
+            }
+
+            // Alternative: direct city names without prepositions
+            if (!fromCity || !toCity) {
+                const words = lower.split(/\s+/);
+                for (let i = 0; i < words.length - 1; i++) {
+                    const potentialFrom = findMatchingCity(words[i]);
+                    const potentialTo = findMatchingCity(words[i + 1]);
+                    if (potentialFrom && potentialTo) {
+                        fromCity = potentialFrom;
+                        toCity = potentialTo;
+                        break;
+                    }
+                }
+            }
+
+            if (fromCity && toCity) {
+                const flights = findFlights(fromCity, toCity);
+                if (flights.length > 0) {
+                    return {
+                        text: `✈️ I found ${flights.length} flight${flights.length > 1 ? 's' : ''} from ${fromCity} to ${toCity}:`,
+                        flightSuggestion: `
+                            ${flights.map(flight => `
+                                <div style="margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                                    <strong>${flight.flightNo}</strong><br>
+                                    🛫 ${flight.from} → 🛬 ${flight.to}<br>
+                                    ⏱️ ${flight.duration} • 💰 ₹${flight.price.toLocaleString()}<br>
+                                    <button onclick="selectFlight('${flight.from}', '${flight.to}', ${flight.price}, '${flight.flightNo}')" 
+                                            style="background: #1e3c72; color: white; border: none; padding: 8px 15px; border-radius: 5px; margin-top: 5px; cursor: pointer; width: 100%;">
+                                        Book This Flight
+                                    </button>
+                                </div>
+                            `).join('')}
+                        `
+                    };
+                } else {
+                    return {
+                        text: `❌ I couldn't find direct flights from ${fromCity} to ${toCity}. Would you like me to search for connecting flights or check other destinations?`
+                    };
+                }
+            }
+
+            // Enhanced FAQ responses for voice
+            const faqResponses = {
+                'how do i book': 'You can book flights by telling me your departure and destination cities. For example, say "I want to book a flight from Delhi to Mumbai" or use our website search form.',
+                'baggage': 'For economy class, you can check in one bag up to 23 kilograms and carry one hand luggage up to 7 kilograms. Business class passengers get two checked bags of 32 kilograms each.',
+                'check.in': 'Online check-in opens 24 hours before your flight departure. You can check in through our website or mobile app. Airport check-in counters close 45 minutes before domestic flights.',
+                'cancel': 'You can cancel your flight depending on your ticket type. Flexible tickets allow free cancellation up to 24 hours before departure. Standard tickets may have cancellation fees.',
+                'meal': 'Yes, we serve complimentary meals on all flights longer than 2 hours. You can also request special meals like vegetarian or gluten-free during booking.',
+                'wifi': 'We provide complimentary WiFi on all international flights and most domestic routes. You can stay connected throughout your journey with us.',
+                'payment': 'We accept all major credit cards, debit cards, net banking, UPI, and digital wallets. Your payment is secured with 128-bit encryption.',
+                'refund': 'Refunds are processed within 7 to 10 working days. The amount will be credited back to your original payment method.',
+                'reschedule': 'You can reschedule your flight online through manage booking section. Change fees may apply based on your fare type.',
+                'infant': 'Infants under 2 years can travel on parent\'s lap for 10% of adult fare. We provide bassinets on long-haul flights subject to availability.',
+                'pet': 'Small pets under 8 kilograms can travel in cabin for a fee. Larger pets travel in climate-controlled cargo hold. Service animals fly free.',
+                'visa': 'For international travel, please check visa requirements of your destination country. We recommend applying for visas at least 4 weeks before travel.',
+                'insurance': 'Travel insurance is available during booking. It covers trip cancellation, medical emergencies, lost baggage, and flight delays.',
+                'lounge': 'Business and first class passengers have complimentary access to our airport lounges. Lounge access can also be purchased for economy passengers.',
+                'priority boarding': 'Priority boarding is available for business class, first class, and frequent flyer members. You can also purchase priority boarding during check-in.'
+            };
+
+            // Check for FAQ questions
+            for (const [key, response] of Object.entries(faqResponses)) {
+                if (lower.includes(key)) {
+                    return { text: response };
+                }
+            }
+
+            // Route inquiry
+            if (lower.includes('flight') && (lower.includes('from') || lower.includes('to'))) {
+                return {
+                    text: "I can help you find flights! Please tell me your departure and arrival cities. For example: 'I want to book a flight from Delhi to Mumbai' or 'Bangalore to Chennai flights'"
+                };
+            }
+
+            // Default responses
+            const responses = {
+                'hello': 'Hello! How can I assist you with your travel plans today?',
+                'hi': 'Hi there! Ready to book your next adventure?',
+                'help': 'I can help you with flight bookings, baggage information, check-in procedures, cancellation policies, and more. What would you like to know?',
+                'thank': "You're welcome! Is there anything else I can help you with?",
+                'default': "I'm here to help with your travel needs! You can ask me about flights, baggage, check-in, or click on any frequently asked question above."
+            };
+
+            for (const [key, response] of Object.entries(responses)) {
+                if (lower.includes(key)) {
+                    return { text: response };
+                }
+            }
+
+            return { text: responses.default };
+        }
+
+        function findMatchingCity(input) {
+            const cleanInput = input.toLowerCase().trim();
+            
+            // Direct match
+            for (const city of Object.keys(cities)) {
+                if (city.toLowerCase() === cleanInput) {
+                    return city;
+                }
+            }
+            
+            // Partial match
+            for (const city of Object.keys(cities)) {
+                if (city.toLowerCase().includes(cleanInput) || cities[city].toLowerCase().includes(cleanInput)) {
+                    return city;
+                }
+            }
+            
+            // Common misspellings and abbreviations
+            const commonNames = {
+                'bengaluru': 'Bangalore',
+                'madras': 'Chennai',
+                'calcutta': 'Kolkata',
+                'bombay': 'Mumbai',
+                'new delhi': 'Delhi',
+                'ncr': 'Delhi',
+                'ny': 'New York',
+                'sf': 'San Francisco',
+                'la': 'Los Angeles',
+                'dc': 'Washington',
+                'hk': 'Hong Kong',
+                'kl': 'Kuala Lumpur',
+                'bkk': 'Bangkok'
+            };
+            
+            if (commonNames[cleanInput]) {
+                return commonNames[cleanInput];
+            }
+            
+            return null;
+        }
+
+        function findFlights(from, to) {
+            const allFlights = [...flightData.domestic, ...flightData.international];
+            return allFlights.filter(flight => 
+                flight.from.toLowerCase() === from.toLowerCase() && 
+                flight.to.toLowerCase() === to.toLowerCase()
+            );
+        }
+
+        // Flight selection and booking flow
+        function selectFlight(from, to, price, flightNo) {
+            selectedFlight = { from, to, price, flightNo };
+            
+            // Show passenger details section
+            showSection('passengerDetails');
+            
+            // Update the passenger form with flight info
+            const form = document.getElementById('passengerForm');
+            const existingInfo = form.querySelector('.flight-info');
+            if (existingInfo) existingInfo.remove();
+            
+            const flightInfo = document.createElement('div');
+            flightInfo.className = 'flight-info';
+            flightInfo.style.background = '#f8f9fa';
+            flightInfo.style.padding = '1rem';
+            flightInfo.style.borderRadius = '8px';
+            flightInfo.style.marginBottom = '1rem';
+            flightInfo.innerHTML = `
+                <strong>Selected Flight:</strong> ${flightNo} | ${from} → ${to}<br>
+                <strong>Price:</strong> ₹${price.toLocaleString()}
+            `;
+            form.insertBefore(flightInfo, form.firstChild);
+        }
+
+        // Authentication functions
+        function switchAuthTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            
+            document.querySelector(`.auth-tab:nth-child(${tab === 'login' ? 1 : 2})`).classList.add('active');
+            document.getElementById(tab + 'Form').classList.add('active');
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            alert('Login successful! Welcome back to SkyVoyage Airlines.');
+            showSection('home');
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            alert('Registration successful! Welcome to SkyVoyage Airlines.');
+            showSection('home');
+        }
+
+        function handlePassengerDetails(e) {
+            e.preventDefault();
+            alert('Passenger details saved! Proceeding to payment.');
+            showSection('payment');
+        }
+
+        function handlePayment(e) {
+            e.preventDefault();
+            if (selectedFlight) {
+                alert(`Payment successful! Your booking for flight ${selectedFlight.flightNo} is confirmed. Check your email for details.`);
+            } else {
+                alert('Payment successful! Your booking is confirmed. Check your email for details.');
+            }
+            showSection('home');
+            selectedFlight = null;
+        }
+
+        // Navigation
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function switchTab(type) {
+            currentFlightType = type;
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            document.getElementById('domesticFlights').style.display = type === 'domestic' ? 'block' : 'none';
+            document.getElementById('internationalFlights').style.display = type === 'domestic' ? 'none' : 'block';
+        }
+
+        // Flight search function
+        function searchFlights(e) {
+            e.preventDefault();
+            const from = document.getElementById('from').value;
+            const to = document.getElementById('to').value;
+            
+            if (!from || !to) {
+                alert('Please select both departure and arrival cities.');
+                return;
+            }
+
+            const fromCity = findMatchingCity(from);
+            const toCity = findMatchingCity(to);
+            
+            if (!fromCity || !toCity) {
+                alert('Please select valid cities from the suggestions.');
+                return;
+            }
+
+            const flights = findFlights(fromCity, toCity);
+            const resultsDiv = document.getElementById('flightResults');
+            
+            if (flights.length > 0) {
+                resultsDiv.innerHTML = '<h3 style="margin: 2rem 0;">Available Flights</h3>' +
+                    flights.map(flight => createFlightCard(flight, currentFlightType)).join('');
+            } else {
+                resultsDiv.innerHTML = '<h3 style="margin: 2rem 0; color: #666;">No direct flights found. Please try different cities or check our international routes.</h3>';
+            }
+            
+            resultsDiv.style.display = 'block';
+        }
+
+        // Allow Enter key in chat
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // Set minimum date for return
+        document.getElementById('departDate').addEventListener('change', function() {
+            document.getElementById('returnDate').setAttribute('min', this.value);
+        });
+
+        // Get voices when they become available (for better TTS)
+        window.speechSynthesis.onvoiceschanged = function() {
+            // Voices are now available
+        };
+    </script>
+</body>
+</html>
